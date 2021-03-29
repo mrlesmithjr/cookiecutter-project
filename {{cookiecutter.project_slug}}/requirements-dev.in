@@ -1,0 +1,8 @@
+-c requirements.txt
+ansible-lint
+autopep8
+flake8
+mkdocs
+pycodestyle
+pylint
+yamllint
