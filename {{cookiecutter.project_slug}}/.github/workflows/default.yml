@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          path: {{cookiecutter.project_parent_dir}}
+          path: {{cookiecutter.project_slug}}
           submodules: recursive
 {%- raw %}
       - name: Set up Python ${{ matrix.python-version }}
