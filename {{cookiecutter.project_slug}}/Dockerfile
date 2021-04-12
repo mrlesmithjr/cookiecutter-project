@@ -4,7 +4,7 @@ FROM ubuntu:${VARIANT} AS builder
 
 LABEL maintainer="{{cookiecutter.email}}"
 
-ARG DEFAULT_PYTHON_VERSION=3.9.1
+ARG DEFAULT_PYTHON_VERSION=3.7.10
 ARG USER_GID=1000
 ARG USER_UID=1000
 ARG USERNAME=vscode
@@ -49,17 +49,21 @@ ARG USERNAME=vscode
 ENV LC_ALL="C.UTF-8"
 ENV LANG="C.UTF-8"
 ENV PYENV_ROOT="/home/$USERNAME/.pyenv"
-ENV PATH="$PYENV_ROOT/bin:$PATH"
+ENV TFENV_ROOT="/home/$USERNAME/.tfenv"
+ENV PATH="$PYENV_ROOT/bin:$TFENV_ROOT/bin:$PATH"
 ENV SHELL="/bin/bash"
 
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
     && apt-get update \
-    && apt-get install -y git sudo \
+    && apt-get install -y curl git sudo unzip \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
-    && echo 'eval "$(pyenv init -)"' >> "/home/$USERNAME/.bashrc"
+    && echo 'eval "$(pyenv init -)"' >> "/home/$USERNAME/.bashrc" \
+    && git clone https://github.com/tfutils/tfenv.git "$TFENV_ROOT"
 
 USER $USERNAME
 
 COPY --from=builder $PYENV_ROOT $PYENV_ROOT
+
+RUN sudo chown -R "$USERNAME:$USERNAME" $PYENV_ROOT $TFENV_ROOT
